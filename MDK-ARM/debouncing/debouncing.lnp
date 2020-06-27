@@ -1,0 +1,25 @@
+--cpu=Cortex-M4.fp.sp
+"debouncing\startup_stm32f411xe.o"
+"debouncing\main.o"
+"debouncing\stm32f4xx_it.o"
+"debouncing\stm32f4xx_hal_msp.o"
+"debouncing\stm32f4xx_hal_tim.o"
+"debouncing\stm32f4xx_hal_tim_ex.o"
+"debouncing\stm32f4xx_hal_rcc.o"
+"debouncing\stm32f4xx_hal_rcc_ex.o"
+"debouncing\stm32f4xx_hal_flash.o"
+"debouncing\stm32f4xx_hal_flash_ex.o"
+"debouncing\stm32f4xx_hal_flash_ramfunc.o"
+"debouncing\stm32f4xx_hal_gpio.o"
+"debouncing\stm32f4xx_hal_dma_ex.o"
+"debouncing\stm32f4xx_hal_dma.o"
+"debouncing\stm32f4xx_hal_pwr.o"
+"debouncing\stm32f4xx_hal_pwr_ex.o"
+"debouncing\stm32f4xx_hal_cortex.o"
+"debouncing\stm32f4xx_hal.o"
+"debouncing\stm32f4xx_hal_exti.o"
+"debouncing\system_stm32f4xx.o"
+--library_type=microlib --strict --scatter "debouncing\debouncing.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "debouncing.map" -o debouncing\debouncing.axf
