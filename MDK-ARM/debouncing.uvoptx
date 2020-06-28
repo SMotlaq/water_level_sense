@@ -153,17 +153,12 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>TimeAfterSensorTriged,0x0A</ItemText>
+          <ItemText>KeyState,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>isTimerStarted,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>KeyState,0x0A</ItemText>
+          <ItemText>Avg</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

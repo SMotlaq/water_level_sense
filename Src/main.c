@@ -34,7 +34,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define ALLOWED_TIMEOUT 5
+#define AVG_THRESHOLD	16
+#define SAMPLE_PERIOD	100
 
 /* USER CODE END PD */
 
@@ -47,9 +48,10 @@
 TIM_HandleTypeDef htim1;
 
 /* USER CODE BEGIN PV */
-uint32_t TimeAfterSensorTriged = 0;
-uint8_t  isTimerStarted        = 0;
-uint8_t  KeyState							 = 0;
+uint8_t  KeyState	  = 0;
+uint32_t AllSamples = 0;
+uint32_t sysTick    = 0;
+float		 Avg        = 0.0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,7 +59,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
-
+int SUM(uint32_t value);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -96,7 +98,7 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-	
+	HAL_TIM_Base_Start_IT(&htim1);
   /* USER CODE END 2 */
  
  
@@ -175,9 +177,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 10000-1;
+  htim1.Init.Prescaler = 100-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 10000-1;
+  htim1.Init.Period = 1000-1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -236,28 +238,28 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(GPIO_Pin==KEY_Pin){
-		if(isTimerStarted==0){
-			TimeAfterSensorTriged = 0;
-			isTimerStarted = 1;
-			HAL_TIM_Base_Start_IT(&htim1);
-		}
-	}
+
 }
 
-
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	TimeAfterSensorTriged++;
-	if(TimeAfterSensorTriged >= ALLOWED_TIMEOUT){
-		if(HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin))
+	if(sysTick >= SAMPLE_PERIOD){
+		sysTick = 0;
+  	AllSamples = (AllSamples << 1) + (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin) ? 1 : 0);
+		Avg = SUM(AllSamples)/32.0 * 100;
+		if(SUM(AllSamples) >= AVG_THRESHOLD)
 			KeyState = 1;
-	  else
+		else
 			KeyState = 0;
-		
-		HAL_TIM_Base_Stop(&htim1);
-		isTimerStarted = 0;
-		TimeAfterSensorTriged = 0;
 	}
+	sysTick++;
+}
+
+int SUM(uint32_t value){
+	int sum = 0;
+	for(int i = 0; i < 32; i++){
+		sum = sum + ((value & (1<<i) )>>i);
+	}
+	return sum;
 }
 
 /* USER CODE END 4 */
